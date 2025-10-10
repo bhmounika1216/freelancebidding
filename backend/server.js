@@ -1,4 +1,4 @@
-
+/*
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -24,3 +24,55 @@ if (require.main === module) {
 
 
 module.exports = app
+kndnfd
+
+const express = require('express'); 
+const dotenv = require('dotenv'); 
+const cors = require('cors'); 
+const { connectDB } = require('./config/db');
+
+dotenv.config();
+const app = express(); 
+app.use(cors()); 
+app.use(express.json()); 
+// Routes
+app.use('/api/auth', require('./routes/authRoutes')); 
+app.use('/api/projects', 
+require('./routes/projectRoutes'));
+app.use('/api/milestones',
+require('./routes/milestone'));
+app.use('/api/reviews', require('./routes/review'));
+
+if (require.main === module) { 
+  connectDB().then(() => { 
+    const PORT = process.env.PORT || 5001; 
+    app.listen(PORT, () => console.log('Server running on port ${PORT}'));
+ });
+ }
+
+ module.exports = app;*/
+ const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
+const { connectDB } = require('./config/db');
+
+dotenv.config();
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/projects', require('./routes/projectRoutes'));
+app.use('/api/milestones', require('./routes/milestone'));
+app.use('/api/reviews', require('./routes/review'));
+
+if (require.main === module) {
+  connectDB().then(() => {
+    const PORT = process.env.PORT || 5001;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  });
+}
+
+module.exports = app;

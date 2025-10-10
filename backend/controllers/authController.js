@@ -1,4 +1,4 @@
-
+/*
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -71,3 +71,95 @@ const updateUserProfile = async (req, res) => {
 };
 
 module.exports = { registerUser, loginUser, updateUserProfile, getProfile };
+kdjkbdajkb
+// backend/controllers/authController.js
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+// helper to generate tokens
+const generateToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
+};
+
+// POST /api/auth/register
+const registerUser = async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ message: 'User already exists' });
+
+    const user = await User.create({ name, email, password, role });
+    const token = generateToken(user._id, user.role);
+    res.status(201).json({ id: user._id, name: user.name, email: user.email, token });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// POST /api/auth/login
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || user.password !== password)
+      return res.status(401).json({ message: 'Invalid credentials' });
+
+    const token = generateToken(user._id, user.role);
+    res.status(200).json({ id: user._id, name: user.name, email: user.email, token });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET /api/auth/profile
+const getUserProfile = async (req, res) => {
+  res.json(req.user);
+};
+
+module.exports = { registerUser, loginUser, getUserProfile };
+*/
+// backend/controllers/authController.js
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+// helper to generate tokens
+const generateToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
+};
+
+// POST /api/auth/register
+const registerUser = async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ message: 'User already exists' });
+
+    const user = await User.create({ name, email, password, role });
+    const token = generateToken(user._id, user.role);
+    res.status(201).json({ id: user._id, name: user.name, email: user.email, token });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// POST /api/auth/login
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user || user.password !== password)
+      return res.status(401).json({ message: 'Invalid credentials' });
+
+    const token = generateToken(user._id, user.role);
+    res.status(200).json({ id: user._id, name: user.name, email: user.email, token });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// GET /api/auth/profile
+const getUserProfile = async (req, res) => {
+  res.json(req.user);
+};
+
+module.exports = { registerUser, loginUser, getUserProfile };

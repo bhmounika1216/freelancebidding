@@ -1,4 +1,4 @@
-const Project = require('../models/project');
+/*const Project = require('../models/project');
 
 const getProjects = async (req, res) => {
   try {
@@ -48,7 +48,7 @@ const updateProject = async (req, res) => {
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
     // check if owner
-    if (String(project.userId) !== req.user.id) {
+    if (String(project.userId) !== String(req.user.id)) {
       return res.status(403).json({ message: 'Not authorized to update this project' });
     }
 
@@ -91,4 +91,115 @@ module.exports = {
   addProject,
   updateProject,
   deleteProject
+};
+
+dkjfjh
+const getProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json(projects);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const addProject = async (req, res) => {
+  const { title, description, skills, budgetMin, budgetMax, deadline } = req.body;
+  try {
+    const project = await Project.create({
+      userId: req.user._id,
+      title, description, skills, budgetMin, budgetMax, deadline
+    });
+    res.status(201).json(project);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// update/delete also: compare project.userId with req.user._id
+*/
+// backend/controllers/projectsController.js
+const Project = require('../models/project');
+
+// 🟢 Get all projects
+const getProjects = async (req, res) => {
+  try {
+    const projects = await Project.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json(projects);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 🟢 Get project by ID
+const getProjectById = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+    res.status(200).json(project);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 🟢 Create new project
+const addProject = async (req, res) => {
+  try {
+    const { title, description, skills, budgetMin, budgetMax, deadline } = req.body;
+    const project = await Project.create({
+      userId: req.user._id,
+      title,
+      description,
+      skills,
+      budgetMin,
+      budgetMax,
+      deadline,
+    });
+    res.status(201).json(project);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 🟢 Update project
+const updateProject = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+
+    if (String(project.userId) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    Object.assign(project, req.body);
+    const updated = await project.save();
+    res.status(200).json(updated);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// 🟢 Delete project
+const deleteProject = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Project not found' });
+
+    if (String(project.userId) !== String(req.user._id)) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    await project.deleteOne();
+    res.status(200).json({ message: 'Project deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = {
+  getProjects,
+  getProjectById,
+  addProject,
+  updateProject,
+  deleteProject,
 };
